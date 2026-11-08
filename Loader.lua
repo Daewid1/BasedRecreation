@@ -56,9 +56,14 @@ end
 local function verified(data, size, sha256)
   if type(data) ~= "string" or #data ~= size then return false end
   if type(sha256) ~= "string" or #sha256 ~= 64 or string.find(sha256, "%X") then return false end
-  if type(crypt) ~= "table" or type(crypt.hash) ~= "function" then return false end
-  local ok, digest = pcall(crypt.hash, data, "sha256")
-  return ok and type(digest) == "string" and string.lower(digest) == sha256
+  -- Executor string hashes can stop at a binary file's first null byte.
+  local ok, digest = pcall(function()
+    return game:GetService("EncodingService"):ComputeBufferHash(buffer.fromstring(data), Enum.HashAlgorithm.Sha256)
+  end)
+  if not ok or typeof(digest) ~= "buffer" or buffer.len(digest) ~= 32 then return false end
+  local hex = table.create(32)
+  for index = 0, 31 do hex[index + 1] = string.format("%02x", buffer.readu8(digest, index)) end
+  return table.concat(hex) == sha256
 end
 local function store(path, data)
   local built = ""

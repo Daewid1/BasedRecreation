@@ -7,9 +7,11 @@ assert(verified("abc", 3, string.rep("a", 64)))
 assert(not verified("abd", 3, string.rep("a", 64)))
 assert(not verified("abc", 4, string.rep("a", 64)))
 assert(not verified("abc", 3, "invalid"))
-crypt = nil
+assert(verified("a\0b", 3, string.rep("b", 64)))
+assert(hashedData == "a\0b")
+hashAvailable = false
 assert(not verified("abc", 3, string.rep("a", 64)))
-crypt = { hash = function() return string.rep("a", 64) end }
+hashAvailable = true
 local pack = { at = "packs/test.pack", size = 17, stamp = "test", prefix = "film/hd/test_", from = 0, to = 1, digits = 4, ext = ".jpg" }
 assert(soundPack(pack))
 local bad = table.clone(pack)
