@@ -1,0 +1,7 @@
+*.pack -text -diff
+*.jpg -text -diff
+*.png -text -diff
+*.ogg -text -diff
+*.ttf -text -diff
+*.lua text eol=lf
+*.py text eol=lf
