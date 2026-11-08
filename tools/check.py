@@ -1,8 +1,10 @@
 import argparse
+import hashlib
 import json
 import re
 import subprocess
 from pathlib import Path
+from build import metadata
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -20,6 +22,9 @@ def main():
     run(args.compiler, "--null", ROOT / "Loader.lua")
     folder = ROOT / ".test"
     folder.mkdir(exist_ok=True)
+    fixture = folder / "line_endings.lua"
+    fixture.write_bytes(b"return true\r\n")
+    assert metadata(fixture) == {"size": 12, "sha256": hashlib.sha256(b"return true\n").hexdigest()}
     fixture = folder / "adapter.lua"
     sources = ["tests/adapter_setup.lua", "src/UI/05_config.lua", "src/Menu/Adapter.lua", "tests/adapter_assertions.lua"]
     fixture.write_text("\n".join((ROOT / path).read_text(encoding="utf-8") for path in sources), encoding="utf-8")
@@ -35,6 +40,7 @@ def main():
     assert 'root = "BasedHub"' not in runtime
     assert "do -- dahood" not in runtime
     assert "do -- 26_flight.lua" not in runtime
+    assert "bh_flight_pack" not in runtime and "fly.key." not in runtime and "B.Flight" not in runtime
     assert 'own:keybind({ id = "fly.key.boost"' not in (ROOT / "src/UI/51_keys.lua").read_text(encoding="utf-8")
     assert "Config.capturing" in runtime and "GetFocusedTextBox" in runtime
     expected = set(json.loads((ROOT / "tests/feature_flags.json").read_text(encoding="utf-8")))
@@ -43,8 +49,10 @@ def main():
     assert actual == expected and len(actual) == 72, (expected - actual, actual - expected)
     source = (ROOT / "tools/install.reference.json").read_text(encoding="utf-8")
     reference = json.loads(source)
-    for name, item in reference["files"].items():
-        assert (ROOT / "BasedRecreation" / name).stat().st_size == item["size"], name
+    release = json.loads((ROOT / "install.json").read_text(encoding="utf-8"))
+    assert not any(name.startswith(("fx/", "sfx/bh_fly_", "sfx/bh_hit_")) for name in release["files"])
+    for name, item in release["files"].items():
+        assert metadata(ROOT / "BasedRecreation" / name) == {"size": item["size"], "sha256": item["sha256"]}, name
     count = 0
     for key in ("film", "board", "reel", "lock", "prates", "brand", "richard"):
         for size in reference[key]["sets"]:

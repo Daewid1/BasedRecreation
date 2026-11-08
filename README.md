@@ -27,6 +27,8 @@ All 72 original Huss feature controls remain. Immortal and its advanced options 
 - BasedRecreation.lua: generated executable; Loader.lua: adapted original installer.
 - licenses/ and CREDITS.md: retained source asset attribution.
 
+Flight packs, flight controls and unused flight/hit sound effects are excluded from this Huss edition. Asset hashes use Roblox's binary-safe buffer hashing; release Lua sizes and hashes follow the repository's LF line endings.
+
 The installer writes only BasedRecreation.lua and BasedRecreation/ in the executor workspace. It does not touch HussValley/ or BasedHub/. Preferences, profiles and download records are isolated in the new folder. Run one Huss gameplay edition at a time; two simultaneous gameplay backends are not a supported mode.
 
 The original media collection contains 303 packs (about 1.32 GB total); a normal first install selects the appropriate film resolution instead of downloading every variant. Downloads use request(), an immutable commit pin, byte lengths and SHA-256 before writing. Completed packs are retained for resume. The films play after installation, not over the download screen. The runtime can start from an existing installation when offline.

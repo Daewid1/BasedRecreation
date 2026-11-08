@@ -25,15 +25,22 @@ def build():
 
 def metadata(path):
     data = path.read_bytes()
+    if path.suffix == ".lua":
+        data = data.replace(b"\r\n", b"\n")
     return {"size": len(data), "sha256": hashlib.sha256(data).hexdigest()}
 
 
 def manifest(pin):
     assert re.fullmatch(r"[0-9a-f]{40}", pin), "Expected a complete commit SHA"
     result = json.loads((ROOT / "tools/install.reference.json").read_text(encoding="utf-8"))
-    result["build"] = "20261108.1900"
+    result["build"] = "20261108.1901"
     result["commit"] = pin
     result["hub"] = metadata(ROOT / "BasedRecreation.lua")
+    source = (ROOT / "src/Manifest.lua").read_text(encoding="utf-8")
+    files = re.search(r'B\.MANIFEST = \{\["files"\]=\{(.*?)\}', source).group(1)
+    included = set(re.findall(r'\["([^"]+)"\]=', files))
+    result["files"] = {name: entry for name, entry in result["files"].items() if name in included}
+    assert set(result["files"]) == included
     for name, entry in result["files"].items():
         entry.update(metadata(ROOT / "BasedRecreation" / name))
     for name in ("film", "board", "reel", "lock", "prates", "brand", "richard"):

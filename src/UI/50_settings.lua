@@ -163,7 +163,7 @@ B.pages[#B.pages + 1] = function()
     keys:note({ icon = "info", text = "Right-click any toggle or button to bind it to a key." })
 
     local screen = page:section({ title = "On screen", icon = "monitor", desc = "What stays up while the hub is hidden." })
-    screen:toggle({ id = "app.island", label = "The island", desc = "The pill at the top: frame rate and ping, and your speed in flight. Click it to bring the hub back.", bindable = false })
+    screen:toggle({ id = "app.island", label = "The island", desc = "The pill at the top shows frame rate and ping. Click it to bring the hub back.", bindable = false })
     screen:toggle({ id = "app.keyHud", label = "My keys", desc = "Each bound feature with its key, lit while it is on.", bindable = false })
     screen:toggle({ id = "app.toasts", label = "Say which game this is on launch", tip = "A message naming the game when it loads.", bindable = false })
 

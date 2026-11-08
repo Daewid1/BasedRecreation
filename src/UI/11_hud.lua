@@ -51,16 +51,11 @@ function Hud.start()
   Window.onShow:connect(function(open) show(not open) end)
   Config.on("app.island", function() show(not Window.open) end)
   Config.on("app.gui", function() show(not Window.open) end)
-  -- in flight the island reads the speed instead: it is the number worth watching then
   local tick = 0
   Motion.every(function()
     if not shown then return end
     tick += 1
-    local flight = B.Flight
-    if flight and flight.state == "flying" then
-      local _, speed, mach = flight.status()
-      stats.Text = util.comma(speed) .. " st/s" .. ((mach or 0) >= 1 and string.format("  ·  Mach %.1f", mach) or "")
-    elseif tick % 4 == 0 or stats.Text == "" or string.find(stats.Text, "st/s", 1, true) then
+    if tick % 4 == 0 or stats.Text == "" then
       stats.Text = string.format("%d fps  ·  %d ms", math.floor(Hud.fps() + 0.5), math.floor(Hud.ping() + 0.5))
     end
     key.Text = Config.keyLabel(Config.get("app.key.menu"))

@@ -5,7 +5,7 @@ do -- 51_keys.lua
 --  A key can be given a feature from either side: right-click a toggle or a
 --  button and press a key, or come here, click the key and pick the feature.
 --  The picture is the same either way. A bound key carries its feature's name
---  and lights up while that feature is on; the keys the hub and flight already
+--  and lights up while that feature is on; the keys the hub and movement already
 --  use are marked; a key asked to do two things is flagged. The same list can
 --  sit on screen while the hub is hidden.
 -- ============================================================================
@@ -40,7 +40,7 @@ local function capLabel(key) return LONG[key] or Config.keyLabel(key) end
 local function keyName(key) return Config.keyLabel(key) end
 
 -- ---------------------------------------------------------------- what is on a key
--- the keys the hub and flight already use, read fresh: three of them can be moved
+-- Read the hub and movement keys fresh after rebinding.
 local function readBuiltins()
   local map = {}
   local function put(key, short, what, flag)
@@ -50,9 +50,7 @@ local function readBuiltins()
   end
   put(Config.get("app.key.menu"), "Menu", "opens and closes the hub", "app.key.menu")
   put(Config.get("app.key.panic"), "Panic", "unloads BASED", "app.key.panic")
-  put(Config.get("fly.key.boost"), "Boost", "flight: boost", "fly.key.boost")
-  put(Config.get("fly.key.down"), "Descend", "flight: come down", "fly.key.down")
-  put("Space", "Climb", "flight: charge on the ground, climb in the air")
+  put("Space", "Jump", "jump")
   for _, key in ipairs({ "W", "A", "S", "D" }) do put(key, "Move", "walk and steer") end
   Keys.builtin = map
   return map
@@ -242,7 +240,7 @@ local function paint(entry)
     tint(stroke, "Color", clash and "warn" or "accent")
     fixed(stroke, "Transparency", clash and 0 or 0.35)
   elseif roles then
-    -- the hub's own, or flight's
+    -- Reserved hub and movement keys.
     tint(cap, "BackgroundColor3", "ink")
     tint(cap, "BackgroundTransparency", "fill2A")
     tint(label, "TextColor3", "ink")
@@ -588,7 +586,7 @@ B.pages[#B.pages + 1] = function()
   -- anything that changes what a key does, or whether a bound feature is on, redraws the board
   Config.bindsChanged:connect(function() Keys.repaint() end)
   Config.changed:connect(function(id)
-    if Config.binds[id] or id == "app.key.menu" or id == "app.key.panic" or id == "fly.key.boost" or id == "fly.key.down" then Keys.repaint() end
+    if Config.binds[id] or id == "app.key.menu" or id == "app.key.panic" then Keys.repaint() end
   end)
   Config.loaded:connect(function() Keys.repaint() end)
   Window.page({ id = "keys", title = "Keys", icon = "keyboard", group = "Hub", order = 890, eyebrow = "What every key does", build = function(page)
